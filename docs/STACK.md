@@ -4,7 +4,7 @@
 
 | 영역 | 채택 | 거부 |
 | --- | --- | --- |
-| 프레임워크 | Next.js 15 (App Router) | Pages Router, Remix, Vite SPA |
+| 프레임워크 | Next.js 16 (App Router) | Pages Router, Remix, Vite SPA |
 | 언어 | TypeScript strict | JavaScript |
 | 콘텐츠 저장 | MDX + Git | Sanity, Contentlayer, Notion API, DB 직접 |
 | DB·인증 | Supabase | Firebase, Clerk+Neon, NextAuth+직접 DB |
@@ -25,7 +25,7 @@
 
 ## 결정 근거 (요약, 상세는 DECISIONS/ 참조)
 
-### Next.js 15 App Router
+### Next.js 16 App Router
 
 - **이유**: 학습 콘텐츠는 SSG/ISR 핏이 좋음. SEO 중요(검색 유입). MDX 생태계가 Next에 자연 정렬. App Router는 새 프로젝트의 기본.
 - **트레이드오프**: RSC와 클라이언트 컴포넌트 경계 학습 곡선. 학습 사이트는 인터랙션이 많아 결국 `"use client"` 자주 등장.
