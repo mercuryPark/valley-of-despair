@@ -2,26 +2,26 @@
 
 ## 한 페이지 요약
 
-| 영역 | 채택 | 거부 |
-| --- | --- | --- |
-| 프레임워크 | Next.js 16 (App Router) | Pages Router, Remix, Vite SPA |
-| 언어 | TypeScript strict | JavaScript |
-| 콘텐츠 저장 | MDX + Git | Sanity, Contentlayer, Notion API, DB 직접 |
-| DB·인증 | Supabase | Firebase, Clerk+Neon, NextAuth+직접 DB |
-| 상태 (클라이언트) | Zustand | Redux, Jotai, Recoil, Context 남용 |
-| 데이터 페칭 | React Query (`@tanstack/react-query`) + Supabase 클라이언트 | axios·fetch 직접, SWR |
-| 스타일 | Tailwind v4 + shadcn/ui | CSS-in-JS (styled-components, Emotion) |
-| 폼 | React Hook Form + Zod | Formik |
-| 검색 | Pagefind (빌드 타임) | Algolia, Typesense, FlexSearch |
-| 호스팅 | Vercel | Cloudflare Pages, 자체 호스팅 |
-| 관측 | Sentry + PostHog | GA4 단독, Datadog |
-| 트리 시각화 | 사이드바 (MVP) → React Flow (v1.1) | Three.js 트리, 자체 SVG |
-| 랜딩 3D (v1 마지막) | react-three-fiber + drei | Three.js raw, Babylon.js |
-| 패키지 매니저 | pnpm | npm, yarn |
-| 코드 품질 | ESLint + Prettier + Husky + lint-staged | (생략 안 됨) |
-| 테스트 | Vitest (구현 후 작성) | Jest, TDD 워크플로 |
-| E2E | Playwright (v1.5+) | Cypress |
-| 모바일 앱 | **MVP 없음**, v2+ 검토 | RN/Expo MVP 도입 |
+| 영역                | 채택                                                        | 거부                                      |
+| ------------------- | ----------------------------------------------------------- | ----------------------------------------- |
+| 프레임워크          | Next.js 16 (App Router)                                     | Pages Router, Remix, Vite SPA             |
+| 언어                | TypeScript strict                                           | JavaScript                                |
+| 콘텐츠 저장         | MDX + Git                                                   | Sanity, Contentlayer, Notion API, DB 직접 |
+| DB·인증             | Supabase                                                    | Firebase, Clerk+Neon, NextAuth+직접 DB    |
+| 상태 (클라이언트)   | Zustand                                                     | Redux, Jotai, Recoil, Context 남용        |
+| 데이터 페칭         | React Query (`@tanstack/react-query`) + Supabase 클라이언트 | axios·fetch 직접, SWR                     |
+| 스타일              | Tailwind v4 + shadcn/ui                                     | CSS-in-JS (styled-components, Emotion)    |
+| 폼                  | React Hook Form + Zod                                       | Formik                                    |
+| 검색                | Pagefind (빌드 타임)                                        | Algolia, Typesense, FlexSearch            |
+| 호스팅              | Vercel                                                      | Cloudflare Pages, 자체 호스팅             |
+| 관측                | Sentry + PostHog                                            | GA4 단독, Datadog                         |
+| 트리 시각화         | 사이드바 (MVP) → React Flow (v1.1)                          | Three.js 트리, 자체 SVG                   |
+| 랜딩 3D (v1 마지막) | react-three-fiber + drei                                    | Three.js raw, Babylon.js                  |
+| 패키지 매니저       | pnpm                                                        | npm, yarn                                 |
+| 코드 품질           | ESLint + Prettier + Husky + lint-staged                     | (생략 안 됨)                              |
+| 테스트              | Vitest (구현 후 작성)                                       | Jest, TDD 워크플로                        |
+| E2E                 | Playwright (v1.5+)                                          | Cypress                                   |
+| 모바일 앱           | **MVP 없음**, v2+ 검토                                      | RN/Expo MVP 도입                          |
 
 ## 결정 근거 (요약, 상세는 DECISIONS/ 참조)
 

@@ -35,15 +35,18 @@
 ## 거부된 대안
 
 ### Firebase
+
 - NoSQL → 진척도 같은 정형 데이터에 어색
 - Vendor lock-in 강함 (Firestore 쿼리·트리거 종속)
 - RLS에 해당하는 Security Rules 학습 곡선
 
 ### Clerk + Neon/Planetscale
+
 - Clerk 인증 UX는 매끄럽지만 별도 비용·복잡도
 - 1인 개발에 과함
 
 ### NextAuth + 자체 DB
+
 - 인증 직접 짜기 안티패턴 (보안 리스크)
 - OAuth 콜백·세션·CSRF 다 직접 처리
 

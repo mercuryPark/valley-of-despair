@@ -1,0 +1,6 @@
+pnpm-lock.yaml
+.next
+.vercel
+public
+content
+node_modules
