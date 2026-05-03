@@ -202,7 +202,7 @@ pnpm dlx shadcn@latest init
 
 - `components.json` 신규
 - `src/lib/utils.ts` 신규 (`cn()` 헬퍼)
-- `src/app/globals.css` 수정됨 — shadcn이 자체 stone 토큰 추가. **수동 후속 작업**: 위 "토큰 시스템" 섹션의 `@theme inline` 블록과 `:root`/`.light`로 통합 (shadcn 기본값 위에 우리 Valley 토큰 덮어쓰기).
+- `src/app/globals.css` 수정됨 — shadcn이 자체 stone 토큰 추가. **수동 후속 작업**: 위 "토큰 시스템" 섹션의 `@theme inline` 블록과 `:root`(light)/`.dark`(Valley)로 통합 (shadcn 기본값 위에 우리 Valley 값 덮어쓰기).
 
 ```bash
 # 컴포넌트 5개 (ROADMAP 명시)
