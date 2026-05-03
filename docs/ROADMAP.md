@@ -40,13 +40,14 @@
 - [x] 글로벌 레이아웃 (Header + Sidebar 슬롯 + Main + Footer)
 - [x] Crimson Pro 헤딩 serif (`next/font/google` self-host)
 
-### Day 3 (현재 단계) — Supabase 통합
+### Day 3 (완료) — Supabase 통합
 
-- [ ] Supabase 프로젝트 생성, env 변수
-- [ ] Auth 설정 (Google + GitHub OAuth)
-- [ ] `progress` 테이블 + RLS 정책
-- [ ] `@supabase/ssr` 클라이언트·서버 헬퍼 분리
-- [ ] 로그인/로그아웃 플로 동작 확인
+- [x] Supabase 프로젝트 생성, env 변수 (.env.local + Vercel prod/preview/dev)
+- [x] Auth 설정 (Google + GitHub OAuth, Site URL + Redirect URLs)
+- [x] `progress` 테이블 + RLS 정책 (`supabase/migrations/0001_progress.sql`)
+- [x] `@supabase/ssr` 클라이언트·서버 헬퍼 분리 (`src/lib/supabase/{client,server,middleware}.ts`)
+- [x] 로그인/로그아웃 플로 (`/auth/sign-in`, `/auth/callback`, `/auth/sign-out`, 헤더 AuthButton)
+- [x] Next 16 `proxy.ts` (구 middleware) 세션 갱신
 
 ### Day 4 — 콘텐츠 파이프라인 골격
 
