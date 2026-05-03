@@ -21,18 +21,18 @@
 
 ## 1주차: 인프라 셋업
 
-### Day 1 (현재 단계) — 환경 셋업
+### Day 1 (완료) — 환경 셋업
 
 - [x] pnpm 프로젝트 생성 (Next.js 16 + TS + Tailwind + App Router)
-- [ ] TypeScript strict 강화 (noUncheckedIndexedAccess 등)
-- [ ] ESLint + Prettier (prettier-plugin-tailwindcss)
-- [ ] Husky + lint-staged
-- [ ] GitHub 레포 (private) + main 보호
-- [ ] Vercel 연동 (자동 배포 + PR preview)
+- [x] TypeScript strict 강화 (noUncheckedIndexedAccess 등)
+- [x] ESLint + Prettier (prettier-plugin-tailwindcss)
+- [x] Husky + lint-staged
+- [x] GitHub 레포 (public, build-in-public — ADR 0009) + main 보호
+- [x] Vercel 연동 (자동 배포 + PR preview)
 
-**완료 기준**: 빈 페이지가 `https://valleyofdespair-*.vercel.app`에서 보임
+**완료 기준**: 빈 페이지가 `https://valleyofdespair.vercel.app`에서 보임 ✓
 
-### Day 2 — 디자인 시스템 + shadcn/ui
+### Day 2 (현재 단계) — 디자인 시스템 + shadcn/ui
 
 - [ ] Tailwind v4 디자인 토큰 정의 (컬러·타이포·간격)
 - [ ] 다크/라이트 모드 (`next-themes`)
