@@ -4,7 +4,7 @@
 
 ## 왜 기록하는가
 
-- 새 Claude 인스턴스나 협업자가 *왜 이렇게 했는지* 추적 가능
+- 새 Claude 인스턴스나 협업자가 _왜 이렇게 했는지_ 추적 가능
 - 거부된 대안과 그 이유를 보존하여 같은 논의 반복 방지
 - 결정 재평가 시점·트리거를 명시하여 적절한 시점에 재검토
 
@@ -54,16 +54,16 @@ NNNN-kebab-case-title.md
 
 ## 현재 ADR 목록
 
-| 번호 | 제목 | 상태 |
-| --- | --- | --- |
-| 0001 | MDX over CMS | Accepted |
-| 0002 | Supabase over Firebase | Accepted |
+| 번호 | 제목                             | 상태     |
+| ---- | -------------------------------- | -------- |
+| 0001 | MDX over CMS                     | Accepted |
+| 0002 | Supabase over Firebase           | Accepted |
 | 0003 | Sidebar Tree over React Flow MVP | Accepted |
 | 0004 | Learning First, Evaluation Later | Accepted |
-| 0005 | Next.js + PWA Single Platform | Accepted |
-| 0006 | FE Depth over Broad Coverage | Accepted |
-| 0007 | Content Composition Principle | Accepted |
-| 0008 | Next.js 16 채택 (15 → 16 상향) | Accepted |
+| 0005 | Next.js + PWA Single Platform    | Accepted |
+| 0006 | FE Depth over Broad Coverage     | Accepted |
+| 0007 | Content Composition Principle    | Accepted |
+| 0008 | Next.js 16 채택 (15 → 16 상향)   | Accepted |
 
 ## 새 ADR 추가 시점
 
