@@ -63,6 +63,7 @@ NNNN-kebab-case-title.md
 | 0005 | Next.js + PWA Single Platform | Accepted |
 | 0006 | FE Depth over Broad Coverage | Accepted |
 | 0007 | Content Composition Principle | Accepted |
+| 0008 | Next.js 16 채택 (15 → 16 상향) | Accepted |
 
 ## 새 ADR 추가 시점
 

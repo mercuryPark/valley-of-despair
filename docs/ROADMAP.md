@@ -23,7 +23,7 @@
 
 ### Day 1 (현재 단계) — 환경 셋업
 
-- [ ] pnpm 프로젝트 생성 (Next.js 15 + TS + Tailwind + App Router)
+- [x] pnpm 프로젝트 생성 (Next.js 16 + TS + Tailwind + App Router)
 - [ ] TypeScript strict 강화 (noUncheckedIndexedAccess 등)
 - [ ] ESLint + Prettier (prettier-plugin-tailwindcss)
 - [ ] Husky + lint-staged
