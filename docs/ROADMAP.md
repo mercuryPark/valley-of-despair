@@ -32,14 +32,15 @@
 
 **완료 기준**: 빈 페이지가 `https://valleyofdespair.vercel.app`에서 보임 ✓
 
-### Day 2 (현재 단계) — 디자인 시스템 + shadcn/ui
+### Day 2 (완료) — 디자인 시스템 + shadcn/ui
 
-- [ ] Tailwind v4 디자인 토큰 정의 (컬러·타이포·간격)
-- [ ] 다크/라이트 모드 (`next-themes`)
-- [ ] shadcn/ui 초기 컴포넌트 (Button, Card, Sheet, Skeleton, Sidebar)
-- [ ] 글로벌 레이아웃 (헤더 + 메인 + 풋터)
+- [x] Tailwind v4 디자인 토큰 정의 (Valley OKLCH stone + amber, `:root`/`.dark`)
+- [x] 다크/라이트 모드 (`next-themes`, dark default + 수동 토글)
+- [x] shadcn/ui 초기 컴포넌트 (Button, Card, Sheet, Skeleton, Sidebar) + new-york style
+- [x] 글로벌 레이아웃 (Header + Sidebar 슬롯 + Main + Footer)
+- [x] Crimson Pro 헤딩 serif (`next/font/google` self-host)
 
-### Day 3 — Supabase 통합
+### Day 3 (현재 단계) — Supabase 통합
 
 - [ ] Supabase 프로젝트 생성, env 변수
 - [ ] Auth 설정 (Google + GitHub OAuth)
