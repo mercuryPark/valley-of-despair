@@ -58,14 +58,14 @@
 - [x] `rehype-slug` + `rehype-autolink-headings` (wrap behavior, `heading-anchor` 클래스)
 - [x] 더미 노드 1개 렌더 확인 (임시 `/learn/preview` — 본 라우팅은 2주차)
 
-### Day 5 — 관측 + CI
+### Day 5 (완료) — 관측 + CI
 
-- [ ] Sentry 통합 (서버·클라이언트 + source map)
-- [ ] PostHog 통합 (page view + identify)
-- [ ] GitHub Actions: typecheck + lint + build
-- [ ] Vercel preview 배포 검증
+- [x] Sentry 통합 (`@sentry/nextjs` 10.x — `instrumentation.ts` 서버/엣지 + `instrumentation-client.ts` + `global-error.tsx`, `withSentryConfig` source map 업로드, `/monitoring` 터널)
+- [x] PostHog 통합 (`posthog-js` lazy init + App Router `$pageview` 캡처 + Supabase `onAuthStateChange`로 identify/reset)
+- [x] GitHub Actions `ci.yml` (pnpm + Node 20, typecheck · lint · build)
+- [x] Vercel prod 배포 검증 (PostHog `$pageview`/identify 도착, Sentry `/monitoring` POST 200, source map 매핑)
 
-**1주차 완료 기준**: 빈 콘텐츠 셸이 prod에 배포됨, 인증 작동, 더미 노드 1개 렌더, 관측 작동
+**1주차 완료 기준**: 빈 콘텐츠 셸이 prod에 배포됨 ✓, 인증 작동 ✓, 더미 노드 1개 렌더 ✓, 관측 작동 ✓
 
 ---
 
