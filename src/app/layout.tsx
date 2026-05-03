@@ -1,8 +1,13 @@
 import type { Metadata } from 'next';
 import { Crimson_Pro, Geist, Geist_Mono } from 'next/font/google';
-import './globals.css';
 
+import { AppSidebar } from '@/components/layout/app-sidebar';
+import { SiteFooter } from '@/components/layout/site-footer';
+import { SiteHeader } from '@/components/layout/site-header';
 import { ThemeProvider } from '@/components/theme-provider';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+
+import './globals.css';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -36,9 +41,16 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${crimsonPro.variable} h-full antialiased`}
     >
-      <body className="bg-background text-foreground flex min-h-full flex-col font-sans">
+      <body className="bg-background text-foreground min-h-full font-sans">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          {children}
+          <SidebarProvider defaultOpen>
+            <AppSidebar />
+            <SidebarInset className="flex min-h-screen flex-col">
+              <SiteHeader />
+              <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-12">{children}</main>
+              <SiteFooter />
+            </SidebarInset>
+          </SidebarProvider>
         </ThemeProvider>
       </body>
     </html>
