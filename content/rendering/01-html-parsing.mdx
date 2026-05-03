@@ -1,0 +1,69 @@
+---
+id: rendering-html-parsing
+title: HTML 파싱과 DOM 구성
+domain: rendering
+order: 1
+prerequisites: []
+estimatedMinutes: 12
+difficulty: beginner
+tags:
+  - browser
+  - dom
+crossLinks:
+  - performance-reflow
+status: published
+updatedAt: 2026-05-03
+summary: 브라우저가 바이트 스트림으로 받은 HTML을 토큰화·파싱해 DOM 트리를 만드는 과정과 그 사이에서 일어나는 차단 동작.
+---
+
+## 학습 목표
+
+- 브라우저가 HTML을 바이트로 받아 DOM 트리로 만들기까지의 단계를 설명할 수 있다.
+- 파싱을 차단하는 리소스와 차단하지 않는 리소스를 구분할 수 있다.
+
+## 핵심 개념
+
+브라우저는 네트워크에서 받은 HTML 바이트를 다음 순서로 처리한다.
+
+1. **바이트 → 문자**: 인코딩(UTF-8 등)에 따라 디코딩.
+2. **문자 → 토큰**: HTML 토크나이저가 `<`, 태그, 속성, 텍스트로 분리.
+3. **토큰 → 노드**: 토큰을 DOM 노드 객체로 변환.
+4. **노드 → DOM 트리**: 부모-자식 관계로 트리 구성.
+
+이 과정은 *스트리밍*이다. 전체 HTML이 도착하기 전이라도 받은 만큼 파싱을 진행한다.
+
+## 차단 vs 비차단
+
+- `<script>`(기본): 다운로드·실행이 끝날 때까지 파싱 *차단*.
+- `<script defer>`: 백그라운드 다운로드 후 DOMContentLoaded 직전에 실행. *비차단*.
+- `<script async>`: 백그라운드 다운로드 후 *준비되는 즉시* 실행. 순서 보장 X.
+- `<link rel="stylesheet">`: HTML 파싱은 진행하되 *렌더링과 JS 실행*은 차단.
+
+## 코드 예시
+
+```html
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>HTML 파싱 데모</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script defer src="/app.js"></script>
+  </head>
+  <body>
+    <h1>안녕</h1>
+  </body>
+</html>
+```
+
+`defer`를 사용하면 `app.js` 다운로드가 HTML 파싱과 병렬로 진행되고, 파싱이 끝난 뒤 실행되어 첫 페인트가 빨라진다.
+
+## 자주 하는 오해
+
+- ❌ "DOM 트리가 완성되면 곧바로 화면에 그려진다"
+- ✅ DOM은 구조일 뿐. 화면에 그리려면 CSSOM·렌더 트리·레이아웃·페인트 단계가 더 필요하다.
+
+## 참고 자료
+
+- [Constructing the Object Model — web.dev](https://web.dev/articles/critical-rendering-path/constructing-the-object-model)
+- [Parsing HTML documents — WHATWG](https://html.spec.whatwg.org/multipage/parsing.html)

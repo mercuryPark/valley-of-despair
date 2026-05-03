@@ -49,14 +49,14 @@
 - [x] 로그인/로그아웃 플로 (`/auth/sign-in`, `/auth/callback`, `/auth/sign-out`, 헤더 AuthButton)
 - [x] Next 16 `proxy.ts` (구 middleware) 세션 갱신
 
-### Day 4 — 콘텐츠 파이프라인 골격
+### Day 4 (완료) — 콘텐츠 파이프라인 골격
 
-- [ ] `content/` 디렉토리 구조
-- [ ] frontmatter Zod 스키마 (CONTENT_SCHEMA.md 참조)
-- [ ] `next-mdx-remote` 설정
-- [ ] `shiki` + `rehype-pretty-code` 코드 하이라이팅
-- [ ] `rehype-slug` + `rehype-autolink-headings`
-- [ ] 더미 노드 1개 렌더 확인
+- [x] `content/` 디렉토리 구조 (`content/rendering/01-html-parsing.mdx`)
+- [x] frontmatter Zod 스키마 (`src/lib/content/schema.ts`, gray-matter Date → string preprocess)
+- [x] `next-mdx-remote/rsc` 로더 (`src/lib/content/{loader,mdx}.ts`)
+- [x] `shiki` + `rehype-pretty-code` (github-light/github-dark dual theme)
+- [x] `rehype-slug` + `rehype-autolink-headings` (wrap behavior, `heading-anchor` 클래스)
+- [x] 더미 노드 1개 렌더 확인 (임시 `/learn/preview` — 본 라우팅은 2주차)
 
 ### Day 5 — 관측 + CI
 
