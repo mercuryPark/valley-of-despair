@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Crimson_Pro, Geist, Geist_Mono } from 'next/font/google';
 
+import { PostHogProvider } from '@/components/analytics/posthog-provider';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
@@ -43,14 +44,16 @@ export default function RootLayout({
     >
       <body className="bg-background text-foreground min-h-full font-sans">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          <SidebarProvider defaultOpen>
-            <AppSidebar />
-            <SidebarInset className="flex min-h-screen flex-col">
-              <SiteHeader />
-              <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-12">{children}</main>
-              <SiteFooter />
-            </SidebarInset>
-          </SidebarProvider>
+          <PostHogProvider>
+            <SidebarProvider defaultOpen>
+              <AppSidebar />
+              <SidebarInset className="flex min-h-screen flex-col">
+                <SiteHeader />
+                <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-12">{children}</main>
+                <SiteFooter />
+              </SidebarInset>
+            </SidebarProvider>
+          </PostHogProvider>
         </ThemeProvider>
       </body>
     </html>
