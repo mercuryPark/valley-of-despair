@@ -1,0 +1,151 @@
+---
+id: cloud-deploy-vs-host
+title: 배포(Deploy)와 호스팅(Hosting) — 같은 듯 다른 개념
+domain: cloud
+order: 1
+prerequisites: []
+estimatedMinutes: 12
+difficulty: beginner
+tags:
+  - deployment
+  - hosting
+  - infrastructure
+crossLinks:
+  - backend-rest-api-design
+status: published
+updatedAt: 2026-05-04
+summary: '"배포"와 "호스팅"이 같은 말처럼 쓰이지만 다른 단계를 가리킨다 — 빌드·전송·실행·노출의 흐름을 분리해 이해한다.'
+---
+
+## 학습 목표
+
+배포(Deployment)와 호스팅(Hosting)이 가리키는 단계를 구분하고, 정적 사이트·서버리스·컨테이너·VM 별로 어디까지가 어디인지 파악한다.
+
+## 핵심 개념
+
+흔히 혼용되지만 둘은 다른 단계를 가리킨다.
+
+- **빌드(Build)**: 소스 → 실행 가능한 산출물 (예: `next build`로 만든 정적 HTML + JS)
+- **배포(Deploy)**: 빌드 산출물을 *서비스가 실행될 위치*로 전송
+- **호스팅(Hosting)**: 그 위치에서 _지속적으로 서비스 제공_ (도메인 응답, 정적 파일 서빙, 함수 실행)
+
+배포는 _순간의 액션_, 호스팅은 _지속되는 상태_.
+
+### 호스팅 모델 4가지
+
+| 모델          | 예시                                                 | 무엇을 호스팅?       |
+| ------------- | ---------------------------------------------------- | -------------------- |
+| 정적 호스팅   | Vercel(정적), Netlify, GitHub Pages, S3 + CloudFront | HTML·JS·CSS 파일     |
+| 서버리스 함수 | Vercel Functions, AWS Lambda, Cloudflare Workers     | 요청당 실행되는 함수 |
+| 컨테이너      | AWS ECS·Fargate, Cloud Run, Fly.io                   | Docker 이미지        |
+| VM (전통)     | AWS EC2, GCP Compute Engine                          | 운영체제 + 우리 코드 |
+
+위로 갈수록 _운영 부담 ↓ + 가격 ↓ + 제약 ↑_. 아래로 갈수록 _제약 ↓ + 운영 부담 ↑ + 가격 ↑_.
+
+## 코드 예시
+
+Next.js 프로젝트의 배포 흐름 (Vercel 기준).
+
+```bash
+# 로컬에서 (또는 CI에서)
+git push origin main
+
+# Vercel이 자동으로:
+# 1. git에서 소스 가져옴 (clone)
+# 2. pnpm install
+# 3. pnpm build    ← 빌드 단계
+# 4. 빌드 산출물을 Edge·CDN에 배포  ← 배포 단계
+# 5. https://yourapp.com 응답  ← 호스팅 (지속)
+```
+
+같은 빌드 산출물을 다른 호스팅에 배포 가능:
+
+```bash
+# AWS S3로 정적 호스팅
+pnpm build && pnpm export
+aws s3 sync ./out s3://my-bucket --delete
+
+# Docker 컨테이너로
+docker build -t myapp .
+docker push myrepo/myapp
+# 이후 ECS·Cloud Run 등에서 컨테이너 실행
+```
+
+## 실무 시나리오
+
+**케이스 1 — "왜 배포가 자꾸 깨지지?"**
+
+매번 `git push` 후 사이트가 5분간 안 보인다. 배포 중에 504 Gateway Timeout 발생.
+
+원인: 컨테이너 호스팅에서 _기존 컨테이너 종료 후 새 컨테이너 시작_ 시 다운타임 발생.
+
+해결: **무중단 배포(Zero-downtime Deployment)** 기법. Blue-Green 또는 Rolling 업데이트.
+
+- Blue-Green: 새 버전(Green)을 별도 환경에 띄운 뒤, 트래픽을 한 번에 Green으로 스위치
+- Rolling: 인스턴스를 순차적으로 1개씩 새 버전으로 교체
+
+매니지드 서비스(Vercel·Cloud Run)는 이걸 자동 처리. 직접 EC2 위에 띄우면 직접 구현 필요.
+
+**케이스 2 — 트래픽이 적은데 매달 청구서가 큼**
+
+사이드 프로젝트로 EC2 t3.medium 1대 띄워서 사용자 100명 받고 있다. 월 ~$30. 사용자는 하루 평균 50명.
+
+원인: VM은 트래픽 0이어도 24시간 운영비 청구.
+
+해결: 정적 호스팅 + 서버리스 함수 조합 (예: Vercel + Vercel Functions). 월 $0~$5. 함수는 호출당 과금이라 트래픽 적으면 거의 무료.
+
+운영 비용 최적화에서 가장 빠른 효과 — 서버리스로 옮기는 것.
+
+## 분야 간 연결
+
+- **backend (REST API)**: 같은 API라도 호스팅 모델에 따라 콜드 스타트(Cold Start) 동작이 다름. 서버리스는 첫 요청에 지연(~100ms) 발생, 컨테이너·VM은 따뜻함
+- **frontend**: 정적 호스팅은 CDN 엣지에서 응답 → 글로벌 사용자에게 빠름
+
+## 자가 점검
+
+### 개념 체크
+
+- [ ] 빌드·배포·호스팅이 가리키는 단계를 구분해 설명할 수 있는가?
+- [ ] 호스팅 4가지 모델(정적·서버리스·컨테이너·VM)의 운영 부담 순서를 말할 수 있는가?
+- [ ] 무중단 배포가 필요한 이유를 설명할 수 있는가?
+
+### 시나리오
+
+**Q1.** Next.js 사이드 프로젝트를 월 비용 최저로 운영하려 한다. 무엇을 골라야 하나?
+
+<details>
+<summary>답 보기</summary>
+
+**Vercel Hobby (무료) 또는 Cloudflare Pages**. 정적 페이지 + 서버리스 함수 모델로 트래픽 적으면 거의 무료. SSR/ISR이 필요하면 Vercel이 가장 매끄러움. 순수 정적이면 Cloudflare Pages도 강력.
+
+EC2·VPS는 트래픽 0이어도 월 ~$5+. 사이드 프로젝트엔 적합 X.
+
+</details>
+
+**Q2.** 회사에서 운영하던 Node.js 서버를 EC2에서 Lambda(서버리스)로 옮기려 한다. 무엇을 먼저 검토해야 하나?
+
+<details>
+<summary>답 보기</summary>
+
+**1. 콜드 스타트**: Lambda는 첫 호출에 ~100ms 지연. 사용자 인터랙티브 API라면 영향 큼. 해결책으로 Provisioned Concurrency(상시 워밍, 추가 비용).
+**2. 실행 시간 제한**: Lambda는 최대 15분. 장기 실행 작업은 Step Functions·SQS로 분할 필요.
+**3. 메모리·동시 실행 제한**: 단일 Lambda는 최대 10GB 메모리, 계정 동시 실행 1000개 (요청 시 증가).
+**4. 패키지 크기**: Lambda 압축 후 50MB·압축 해제 250MB 제한. 큰 라이브러리는 Lambda Layers로 분리.
+
+이 4개 통과하면 비용·운영 모두 큰 이득.
+
+</details>
+
+## 자주 하는 오해
+
+- ❌ "서버리스는 서버가 없다"
+- ✅ 서버는 있음. 다만 _우리가 관리하지 않음_. 운영 책임이 클라우드 제공자에게 위임됐을 뿐
+- ❌ "정적 호스팅은 동적 기능을 못 한다"
+- ✅ 정적 호스팅 + 서버리스 함수 조합으로 동적 기능 가능 (예: Vercel + Vercel Functions). JAMstack 패턴
+
+## 참고 자료
+
+- [Hosting Web Apps — MDN](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Web_mechanics/How_does_the_Internet_work)
+- [Vercel — Deployment Concepts](https://vercel.com/docs/deployments/overview)
+- [AWS — Compute Services 비교](https://aws.amazon.com/products/compute/)
+- [JAMstack](https://jamstack.org/)
