@@ -15,7 +15,7 @@
 | 검색                | Pagefind (빌드 타임)                                        | Algolia, Typesense, FlexSearch            |
 | 호스팅              | Vercel                                                      | Cloudflare Pages, 자체 호스팅             |
 | 관측                | Sentry + PostHog                                            | GA4 단독, Datadog                         |
-| 트리 시각화         | 사이드바 (MVP) → React Flow (v1.1)                          | Three.js 트리, 자체 SVG                   |
+| 트리 시각화         | 사이드바 (MVP) → React Flow 도메인 그래프 (v1.1)            | Three.js 트리, 자체 SVG                   |
 | 랜딩 3D (v1 마지막) | react-three-fiber + drei                                    | Three.js raw, Babylon.js                  |
 | 패키지 매니저       | pnpm                                                        | npm, yarn                                 |
 | 코드 품질           | ESLint + Prettier + Husky + lint-staged                     | (생략 안 됨)                              |
@@ -90,6 +90,19 @@
 - **랜딩 v1 마지막**: react-three-fiber 3D (1~2주)
 - **거부**: 학습 트리 자체를 Three.js로 만드는 방향. 자유 탐색 파괴, SEO·접근성·성능·1인 개발 비용 모두 안티패턴.
 
+## 도메인 분류 (콘텐츠)
+
+| slug          | 한국어 라벨       | 범위                                       |
+| ------------- | ----------------- | ------------------------------------------ |
+| `foundations` | Web 기초          | HTML/CSS/HTTP, 브라우저 기본, 웹 표준      |
+| `frontend`    | 프론트엔드        | 렌더링·상태·React/Vue·번들·클라이언트 성능 |
+| `backend`     | 백엔드 (API 포함) | 서버·API 설계·REST/GraphQL·인증·인가       |
+| `database`    | 데이터베이스      | 관계·NoSQL·트랜잭션·인덱스·정합성          |
+| `cloud`       | 클라우드·DevOps   | AWS·CI/CD·인프라 기초·관측                 |
+| `cs`          | 컴퓨터 과학       | 알고리즘·자료구조·OS·네트워크 기초         |
+
+`src/lib/content/schema.ts`의 `DOMAINS`·`DOMAIN_META`가 단일 출처.
+
 ## 환경변수 표준 (`.env.local`)
 
 ```bash
@@ -142,3 +155,6 @@ NEXT_PUBLIC_POSTHOG_HOST=
 - ❌ Webpack 직접 설정 (Next.js 기본 유지)
 - ❌ Babel 커스텀 설정 (SWC 기본 유지)
 - ❌ npm·yarn 사용 (pnpm 통일)
+- ❌ 본인이 검수하지 않은 LLM 출력을 그대로 publish (status: draft → review → published 강제)
+- ❌ 사이트 노드 분류를 FE 4 도메인으로 한정 (현재 6개 동등 도메인: foundations/frontend/backend/database/cloud/cs)
+- ❌ "본인 실무 경험" 1인칭 콘텐츠 의무화 (큐레이션 모델로 전환)
