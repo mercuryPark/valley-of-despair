@@ -1,0 +1,177 @@
+---
+id: database-relational-vs-nosql
+title: 관계형 DB와 NoSQL — 언제 무엇을 쓰나
+domain: database
+order: 1
+prerequisites: []
+estimatedMinutes: 16
+difficulty: intermediate
+tags:
+  - rdbms
+  - nosql
+  - schema
+crossLinks:
+  - backend-rest-api-design
+status: published
+updatedAt: 2026-05-04
+summary: 관계형(스키마·트랜잭션·조인) vs NoSQL(스키마리스·수평 확장·다양한 모델)의 본질 차이와 실무 선택 기준.
+---
+
+## 학습 목표
+
+관계형 DB와 NoSQL의 핵심 차이(데이터 모델·스키마·트랜잭션·확장)를 이해하고 신규 프로젝트에서 어떤 걸 선택할지 판단할 수 있다.
+
+## 핵심 개념
+
+### 관계형 DB (RDBMS, 예: PostgreSQL · MySQL)
+
+- **데이터 모델**: 테이블(행·열)과 외래키로 표현된 _관계_
+- **스키마**: 미리 정의 (CREATE TABLE), 변경 시 마이그레이션 필요
+- **쿼리**: SQL — 표준화, JOIN으로 여러 테이블 결합
+- **트랜잭션**: ACID 보장 (Atomicity·Consistency·Isolation·Durability)
+- **확장**: 수직(서버 사양 ↑) 위주, 수평은 어려움(샤딩 복잡)
+
+### NoSQL (예: MongoDB · DynamoDB · Redis · Cassandra)
+
+NoSQL은 단일 카테고리 아님. 4가지 하위 모델:
+
+| 모델      | 예시                 | 특징                      |
+| --------- | -------------------- | ------------------------- |
+| Document  | MongoDB              | JSON 형태 문서, 중첩 구조 |
+| Key-Value | Redis · DynamoDB     | 단순 키 → 값, 매우 빠름   |
+| Column    | Cassandra · BigQuery | 컬럼 단위 저장, 대량 분석 |
+| Graph     | Neo4j                | 노드·엣지, 관계 탐색      |
+
+공통 특징:
+
+- **스키마**: 보통 유연 (필드 추가·변경 자유). 단, 검증을 앱 레벨에서 책임
+- **트랜잭션**: 제한적 (단일 문서 ACID는 가능, 다중 문서는 복잡)
+- **확장**: 수평 우선 — 샤딩이 처음부터 설계에 반영
+- **쿼리**: 모델별 다름. SQL 표준 X
+
+## 코드 예시
+
+같은 데이터를 두 모델로 표현해보자.
+
+**관계형 (PostgreSQL)**
+
+```sql
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL
+);
+
+CREATE TABLE posts (
+  id SERIAL PRIMARY KEY,
+  user_id INT REFERENCES users(id),
+  title TEXT,
+  body TEXT
+);
+
+-- 사용자의 글 목록
+SELECT u.name, p.title
+FROM users u
+JOIN posts p ON p.user_id = u.id
+WHERE u.id = 42;
+```
+
+**Document (MongoDB)**
+
+```js
+// users 컬렉션 — posts를 중첩
+{
+  _id: ObjectId("..."),
+  email: "user@example.com",
+  name: "Alice",
+  posts: [
+    { title: "Hello", body: "..." },
+    { title: "World", body: "..." }
+  ]
+}
+
+// 같은 조회 — JOIN 없음
+db.users.findOne({ _id: ObjectId("...") })
+```
+
+문서형은 *읽기 쉬움 + 한 번 조회로 끝*이지만, 같은 user의 post를 여러 곳에서 참조하면 데이터 중복 문제 발생.
+
+## 실무 시나리오
+
+**케이스 1 — 신규 SaaS의 사용자·계정·청구 데이터**
+
+스타트업이 SaaS 만든다. 사용자·팀·결제·구독 등 엔티티 간 관계가 많고 정합성이 중요(돈 관련).
+
+선택: **관계형 (PostgreSQL)**. 이유:
+
+- 외래키 + 트랜잭션으로 데이터 정합성 보장 (예: 결제 row 생성 ↔ 잔액 차감 동시 성공/실패)
+- JOIN으로 "이 팀의 활성 사용자" 같은 쿼리 자연스러움
+- Supabase·Neon 등 매니지드 PostgreSQL이 풍부
+
+**케이스 2 — 글로벌 게임의 실시간 리더보드**
+
+100만 동시 사용자, 매 초 점수 업데이트, 상위 N명 조회.
+
+선택: **Redis (Sorted Set)**. 이유:
+
+- `ZADD`·`ZRANGE`가 정확히 리더보드용 자료구조 제공 (O(log N))
+- 메모리 기반, 매 초 쓰기·읽기에도 1ms 미만 응답
+- 영속성은 보조 — 진짜 정답은 PostgreSQL에 저장하고 Redis는 핫 캐시
+
+대부분 실무는 **혼합**. 정합성 필요한 쪽은 RDBMS, 핫·확장 필요한 쪽은 NoSQL.
+
+## 분야 간 연결
+
+- **backend (REST API)**: 관계형 DB는 자원 중심 URL과 자연스럽게 매핑(`/users/42` ↔ `users.id = 42`). NoSQL은 자원 경계가 모호할 수 있음
+- **cloud**: 매니지드 RDBMS(RDS·Cloud SQL) vs 매니지드 NoSQL(DynamoDB·Firestore) 운영 비용 차이
+- **cs (자료구조)**: 관계형 인덱스는 B-Tree, Redis Sorted Set은 Skip List, MongoDB는 B-Tree + 보조 인덱스 다양
+
+## 자가 점검
+
+### 개념 체크
+
+- [ ] ACID 4글자가 각각 무엇인지 말할 수 있는가?
+- [ ] NoSQL 4가지 모델(Document·Key-Value·Column·Graph) 차이를 한 줄씩 설명할 수 있는가?
+- [ ] 수직 확장과 수평 확장의 차이를 설명할 수 있는가?
+
+### 시나리오
+
+**Q1.** 친구 추천 시스템 — "친구의 친구의 친구" 깊이 3까지 탐색해야 한다. 어떤 DB가 적합한가?
+
+<details>
+<summary>답 보기</summary>
+
+**그래프 DB (Neo4j)**. 관계형 DB로도 가능하지만 깊이 N의 JOIN은 N이 커질수록 폭발적으로 느려짐. 그래프 DB는 노드 간 관계 탐색이 O(이웃 수)로 효율적.
+
+소규모면 관계형도 충분 (recursive CTE). 대규모(SNS 등)에서는 그래프 DB가 정답.
+
+</details>
+
+**Q2.** 신규 서비스 시작 시 RDBMS와 NoSQL 중 무엇으로 시작해야 할까?
+
+<details>
+<summary>답 보기</summary>
+
+**대부분의 경우 RDBMS (PostgreSQL)**. 이유:
+
+- 초기엔 데이터 모델·접근 패턴이 불확실 — RDBMS의 유연한 쿼리(JOIN·WHERE)가 안전판
+- 정합성 무료로 얻음 (NoSQL은 앱이 책임)
+- 나중에 핫 캐시(Redis)·검색(Elasticsearch) 추가는 점진 가능
+
+NoSQL부터 시작이 정답인 경우: (1) 스키마가 처음부터 명확하고 단순한 key-value, (2) 처음부터 100K+ TPS 예상, (3) 글로벌 멀티 리전 필수.
+
+</details>
+
+## 자주 하는 오해
+
+- ❌ "NoSQL은 SQL 안 쓴다"
+- ✅ NoSQL = "Not Only SQL". 일부 NoSQL(예: BigQuery)은 SQL 인터페이스 제공
+- ❌ "관계형은 느리고 NoSQL은 빠르다"
+- ✅ 워크로드별 다름. 단일 row 조회는 RDBMS가 마이크로초 단위로 끝남. NoSQL이 빠른 건 *수평 확장이 쉬워 더 큰 데이터를 분산 처리할 수 있다*는 뜻
+
+## 참고 자료
+
+- [PostgreSQL vs NoSQL — DigitalOcean](https://www.digitalocean.com/community/tutorials/sqlite-vs-mysql-vs-postgresql-a-comparison-of-relational-database-management-systems)
+- [Designing Data-Intensive Applications — Martin Kleppmann (책)](https://dataintensive.net/)
+- [MongoDB Data Modeling Patterns](https://www.mongodb.com/docs/manual/applications/data-models/)
+- [Redis Data Types Tutorial](https://redis.io/docs/data-types/)
