@@ -1,0 +1,132 @@
+---
+id: frontend-rendering-pipeline
+title: 브라우저 렌더링 파이프라인
+domain: frontend
+order: 1
+prerequisites:
+  - foundations-html-parsing
+estimatedMinutes: 15
+difficulty: intermediate
+tags:
+  - rendering
+  - performance
+crossLinks:
+  - cs-data-structures
+status: published
+updatedAt: 2026-05-04
+summary: HTML·CSS를 받은 뒤 화면에 픽셀로 그려지기까지의 5단계 — DOM·CSSOM·Render Tree·Layout·Paint·Composite.
+---
+
+## 학습 목표
+
+브라우저가 HTML과 CSS를 받아 화면에 픽셀로 그리기까지 거치는 단계와 각 단계에서 어떤 일이 일어나는지 이해한다.
+
+## 핵심 개념
+
+렌더링 파이프라인(Rendering Pipeline)은 다음 단계로 구성된다.
+
+1. **DOM 구성** — HTML 파싱으로 DOM 트리 생성 (`foundations-html-parsing` 참조)
+2. **CSSOM 구성** — CSS 파싱으로 CSSOM(CSS Object Model) 트리 생성
+3. **Render Tree 구성** — DOM + CSSOM 결합. `display: none`인 노드는 제외됨
+4. **Layout (Reflow)** — 각 노드의 정확한 위치·크기 계산. 뷰포트 기반
+5. **Paint** — 픽셀 값 계산 (색·테두리·그림자 등)
+6. **Composite** — 레이어를 GPU에서 합성해 최종 화면 출력
+
+각 단계는 이전 단계 결과에 의존한다. DOM·CSSOM 생성은 *병렬*이지만 Render Tree부터는 *순차*다.
+
+## 코드 예시
+
+다음 CSS는 각각 어느 단계까지 영향을 주는지 비교해보자.
+
+```css
+/* Layout부터 다시 — 가장 비쌈 */
+.card {
+  width: 200px;
+}
+
+/* Paint부터 — Layout 안 함 */
+.card {
+  background: red;
+}
+
+/* Composite만 — GPU에서 처리, 가장 쌈 */
+.card {
+  transform: translateX(100px);
+}
+```
+
+JS에서 DOM을 변경할 때도 동일하다. `el.style.width = '300px'`는 Layout부터, `el.style.opacity = '0.5'`는 Composite만.
+
+## 실무 시나리오
+
+**케이스 1 — 스크롤 중 끊김**
+
+긴 리스트를 스크롤할 때 끊김이 발생한다. DevTools Performance 탭에서 보면 매 프레임 Layout이 발생하고 있다.
+
+원인: 리스트 아이템에 `position: absolute` + `top: ${index * 60}px` 식으로 위치를 잡고 있어, 스크롤 시 매번 Layout이 일어난다.
+
+해결: `transform: translateY(${index * 60}px)`로 변경. transform은 Composite만 발생, 60fps 유지 가능.
+
+**케이스 2 — 이미지 갤러리에서 클릭 시 깜빡임**
+
+이미지 클릭 → 모달 열기 시 화면이 한 번 깜빡인다.
+
+원인: 모달이 `display: none` → `display: block`으로 토글되며 Layout 전체가 다시 계산됨.
+
+해결: `display` 대신 `opacity` + `pointer-events`로 토글. 또는 `visibility: hidden`(Layout은 차지하지만 Paint 안 됨).
+
+## 분야 간 연결
+
+- **foundations**: DOM 구성은 Web 기초의 HTML 파싱 결과. CSSOM은 Web 기초의 CSS 파싱 결과
+- **cs (자료구조)**: Render Tree는 DOM 트리에서 일부 노드를 필터한 결과. 트리 자료구조 변환의 한 사례
+
+## 자가 점검
+
+### 개념 체크
+
+- [ ] 렌더링 파이프라인 6단계의 이름과 순서를 말할 수 있는가?
+- [ ] Layout / Paint / Composite의 비용 차이를 설명할 수 있는가?
+- [ ] DOM 구성과 CSSOM 구성이 병렬인지 순차인지 말할 수 있는가?
+
+### 시나리오
+
+**Q1.** 다음 두 코드의 성능 차이는?
+
+```js
+// A
+el.style.left = '100px';
+
+// B
+el.style.transform = 'translateX(100px)';
+```
+
+<details>
+<summary>답 보기</summary>
+
+**B가 압도적으로 쌈**. A는 `left` 속성이 Layout에 영향을 주므로 Layout → Paint → Composite 전부 다시 일어난다. B는 transform이 GPU 합성 속성이므로 Composite만 발생, Layout/Paint 스킵.
+
+스크롤·드래그 같은 매 프레임 변하는 위치는 항상 transform 권장.
+
+</details>
+
+**Q2.** 어떤 페이지 로딩 시 렌더링이 시작되지 않고 흰 화면만 보인다. CSS 파일 다운로드를 모니터링하면 정상 완료. 무엇이 문제일 수 있는가?
+
+<details>
+<summary>답 보기</summary>
+
+**JS의 파서 차단 + Render Tree 미완성**. 외부 CSS가 받아져 CSSOM은 완성됐어도, `<head>`에 박힌 일반 `<script>`가 다운로드·실행 중이면 파서가 멈춰 DOM이 미완성 상태. Render Tree는 DOM·CSSOM 둘 다 필요하므로 렌더링이 시작 안 됨.
+
+해결: `<script defer>` 또는 `<script async>` 적용 (`foundations-html-parsing` 참조).
+
+</details>
+
+## 자주 하는 오해
+
+- ❌ "Reflow와 Repaint는 같은 것"
+- ✅ Reflow(=Layout)는 위치·크기 재계산이 일어나는 것. Repaint(=Paint)는 픽셀 다시 그리는 것. Reflow가 일어나면 보통 Repaint도 동반된다(역은 아님)
+
+## 참고 자료
+
+- [Critical Rendering Path — web.dev](https://web.dev/articles/critical-rendering-path)
+- [Rendering Performance — web.dev](https://web.dev/articles/rendering-performance)
+- [CSS Triggers (어느 속성이 어느 단계 트리거하는지)](https://csstriggers.com/)
