@@ -31,6 +31,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   };
 }
 
+const DIFFICULTY_LABEL: Record<string, string> = {
+  beginner: '입문',
+  intermediate: '중급',
+  advanced: '고급',
+};
+
 export default async function NodePage({
   params,
 }: {
@@ -52,13 +58,17 @@ export default async function NodePage({
 
   return (
     <article>
+      <div className="text-muted-foreground mb-6 text-sm">
+        <Link href={`/learn/${node.domain}`} className="hover:underline">
+          ← {domainMeta.label}
+        </Link>
+      </div>
+
       <header className="border-border mb-8 border-b pb-6">
         <p className="text-muted-foreground text-sm">
-          <Link href={`/learn/${node.domain}`} className="hover:underline">
-            {domainMeta.label}
-          </Link>
-          {' · '}
-          {node.frontmatter.estimatedMinutes}분 · {node.frontmatter.difficulty}
+          {node.frontmatter.estimatedMinutes}분 ·{' '}
+          {DIFFICULTY_LABEL[node.frontmatter.difficulty] ?? node.frontmatter.difficulty} ·{' '}
+          {node.frontmatter.updatedAt} · {node.frontmatter.status}
         </p>
         <h1 className="mt-2 font-serif text-4xl font-semibold tracking-tight">
           {node.frontmatter.title}
@@ -89,35 +99,41 @@ export default async function NodePage({
       </div>
 
       <p className="text-muted-foreground border-border mt-8 border-t pt-4 text-xs">
-        이 노드는 외부 자료(MDN·web.dev·공식 문서)와 LLM 보조로 정리한 학습 노트입니다.
+        이 노드는 외부 자료(MDN·web.dev·공식 문서)와 LLM 보조로 정리한 학습 노트이다.
       </p>
 
-      {(prev || next) && (
-        <nav className="border-border mt-12 grid grid-cols-2 gap-4 border-t pt-6">
-          <div>
-            {prev && (
-              <Link
-                href={`/learn/${prev.domain}/${prev.slug}`}
-                className="border-border hover:bg-muted/40 block rounded-md border p-4 transition-colors"
-              >
-                <p className="text-muted-foreground text-xs">← 이전</p>
-                <p className="mt-1 text-sm font-medium">{prev.frontmatter.title}</p>
-              </Link>
-            )}
-          </div>
-          <div className="text-right">
-            {next && (
-              <Link
-                href={`/learn/${next.domain}/${next.slug}`}
-                className="border-border hover:bg-muted/40 block rounded-md border p-4 transition-colors"
-              >
-                <p className="text-muted-foreground text-xs">다음 →</p>
-                <p className="mt-1 text-sm font-medium">{next.frontmatter.title}</p>
-              </Link>
-            )}
-          </div>
-        </nav>
-      )}
+      <nav className="border-border mt-12 grid grid-cols-2 gap-4 border-t pt-6">
+        <div>
+          {prev && (
+            <Link
+              href={`/learn/${prev.domain}/${prev.slug}`}
+              className="border-border hover:bg-muted/40 block rounded-md border p-4 transition-colors"
+            >
+              <p className="text-muted-foreground text-xs">← 이전</p>
+              <p className="mt-1 text-sm font-medium">{prev.frontmatter.title}</p>
+            </Link>
+          )}
+        </div>
+        <div className="text-right">
+          {next ? (
+            <Link
+              href={`/learn/${next.domain}/${next.slug}`}
+              className="border-border hover:bg-muted/40 block rounded-md border p-4 transition-colors"
+            >
+              <p className="text-muted-foreground text-xs">다음 →</p>
+              <p className="mt-1 text-sm font-medium">{next.frontmatter.title}</p>
+            </Link>
+          ) : (
+            <Link
+              href={`/learn/${node.domain}`}
+              className="border-border hover:bg-muted/40 block rounded-md border p-4 transition-colors"
+            >
+              <p className="text-muted-foreground text-xs">도메인 목록 →</p>
+              <p className="mt-1 text-sm font-medium">{domainMeta.label}</p>
+            </Link>
+          )}
+        </div>
+      </nav>
     </article>
   );
 }
