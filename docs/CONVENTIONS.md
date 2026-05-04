@@ -39,11 +39,12 @@ src/
 └─ types/
 
 content/                     # MDX 콘텐츠 (레포 루트)
-├─ rendering/
-├─ state/
-├─ performance/
-├─ async/
-└─ side/
+├─ foundations/
+├─ frontend/
+├─ backend/
+├─ database/
+├─ cloud/
+└─ cs/
 ```
 
 ### 명명
