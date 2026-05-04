@@ -88,6 +88,10 @@ export default async function NodePage({
         <MDXRemote source={node.body} options={{ mdxOptions }} />
       </div>
 
+      <p className="text-muted-foreground border-border mt-8 border-t pt-4 text-xs">
+        이 노드는 외부 자료(MDN·web.dev·공식 문서)와 LLM 보조로 정리한 학습 노트입니다.
+      </p>
+
       {(prev || next) && (
         <nav className="border-border mt-12 grid grid-cols-2 gap-4 border-t pt-6">
           <div>

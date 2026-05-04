@@ -1,50 +1,40 @@
 import { z } from 'zod';
 
 export const DOMAINS = [
-  'rendering',
-  'state',
-  'performance',
-  'async',
-  'side-http',
-  'side-auth',
-  'side-db',
-  'side-server',
+  'foundations',
+  'frontend',
+  'backend',
+  'database',
+  'cloud',
+  'cs',
 ] as const;
 
 export type Domain = (typeof DOMAINS)[number];
 
 export const DOMAIN_META: Record<Domain, { label: string; description: string }> = {
-  rendering: {
-    label: '렌더링',
-    description: '브라우저가 HTML·CSS·JS를 받아 픽셀로 만드는 파이프라인.',
+  foundations: {
+    label: 'Web 기초',
+    description: 'HTML/CSS/HTTP, 브라우저 기본, 웹 표준.',
   },
-  state: {
-    label: '상태 관리',
-    description: '클라이언트 상태와 서버 상태의 분리, 동기화 전략.',
+  frontend: {
+    label: '프론트엔드',
+    description: '렌더링·상태·React/Vue·번들·클라이언트 성능.',
   },
-  performance: {
-    label: '성능',
-    description: '측정 가능한 지표 위주의 최적화 — 로딩·런타임·메모리.',
+  backend: {
+    label: '백엔드 (API 포함)',
+    description: '서버·API 설계·REST/GraphQL·인증·인가.',
   },
-  async: {
-    label: '비동기·네트워크',
-    description: 'Promise·이벤트 루프부터 캐싱·재시도까지.',
+  database: {
+    label: '데이터베이스',
+    description: '관계·NoSQL·트랜잭션·인덱스·정합성.',
   },
-  'side-http': {
-    label: 'HTTP 기초',
-    description: 'FE 시점에서 알아야 할 HTTP·CORS·캐시·쿠키.',
+  cloud: {
+    label: '클라우드·DevOps',
+    description: 'AWS·CI/CD·인프라 기초·관측.',
   },
-  'side-auth': {
-    label: '인증·인가 기초',
-    description: '세션·JWT·OAuth — 토큰 저장·갱신·재발급.',
-  },
-  'side-db': {
-    label: '데이터베이스 기초',
-    description: 'FE에서 자주 부딪히는 트랜잭션·인덱스·정합성.',
-  },
-  'side-server': {
-    label: '서버 기초',
-    description: 'BFF·SSR·엣지·서버리스 — FE가 먼저 알면 좋은 서버 측면.',
+  cs: {
+    label: '컴퓨터 과학',
+    description: '알고리즘·자료구조·OS·네트워크 기초.',
   },
 };
 

@@ -1,0 +1,131 @@
+---
+id: foundations-html-parsing
+title: HTML 파싱과 DOM 구성
+domain: foundations
+order: 1
+prerequisites: []
+estimatedMinutes: 12
+difficulty: beginner
+tags:
+  - browser
+  - dom
+status: published
+updatedAt: 2026-05-04
+summary: 브라우저가 바이트 스트림으로 받은 HTML을 토큰화·파싱해 DOM 트리를 만드는 과정과 그 사이에서 일어나는 차단 동작.
+---
+
+## 학습 목표
+
+브라우저가 바이트 스트림으로 받은 HTML을 토큰화·파싱해 DOM 트리를 만드는 과정과 그 사이에서 일어나는 차단 동작을 이해한다.
+
+## 핵심 개념
+
+브라우저는 서버에서 받은 HTML 바이트를 다음 단계로 처리해 DOM(Document Object Model)을 만든다.
+
+1. **바이트 → 문자**: 인코딩(UTF-8 등)에 따라 바이트를 문자로 변환
+2. **문자 → 토큰**: 토크나이저(Tokenizer)가 `<html>`, `</body>` 같은 시작/종료 태그·속성·텍스트를 토큰 단위로 잘라냄
+3. **토큰 → 노드**: 각 토큰이 노드 객체로 만들어짐
+4. **노드 → DOM 트리**: 노드들이 부모-자식 관계로 연결되어 트리 구조를 형성
+
+이 과정에서 특정 리소스는 파싱을 차단(parser-blocking)한다.
+
+- **차단**: 일반 `<script>` 태그 — 다운로드·실행이 끝날 때까지 파서가 정지
+- **부분 차단**: 외부 CSS — DOM 파싱은 계속되지만 렌더링이 차단(CSSOM 완성 대기)
+- **차단 안 함**: `<script async>`, `<script defer>`, preload된 리소스
+
+## 코드 예시
+
+다음 HTML을 받았을 때 파싱 동작을 비교해보자.
+
+```html
+<!-- 케이스 A: 기본 script — 파싱 차단 -->
+<head>
+  <script src="/heavy.js"></script>
+</head>
+<body>
+  <h1>Hello</h1>
+</body>
+
+<!-- 케이스 B: defer — 파싱 차단 안 함, DOMContentLoaded 직전 실행 -->
+<head>
+  <script src="/heavy.js" defer></script>
+</head>
+<body>
+  <h1>Hello</h1>
+</body>
+```
+
+케이스 A에서는 `heavy.js` 다운로드·실행이 끝날 때까지 `<h1>Hello</h1>` 노드가 DOM에 추가되지 않는다. 케이스 B는 파서가 계속 진행하며 `<h1>`을 먼저 DOM에 넣고, `heavy.js`는 DOMContentLoaded 직전에 실행된다.
+
+## 실무 시나리오
+
+**케이스 1 — 첫 페이지 로딩이 느린 사이트**
+
+분석 도구(Google Tag Manager, Hotjar 등)가 `<head>`에 `<script>`로 박혀 있어 페이지 첫 콘텐츠가 늦게 보인다. 사용자에게 노출되는 LCP(Largest Contentful Paint)가 2.5s를 넘는다.
+
+해결: 분석 스크립트에 `defer` 또는 `async` 추가, 또는 `<body>` 끝으로 이동. defer는 실행 순서 보존(여러 스크립트 간 의존성 있을 때), async는 순서 무관한 단발성 스크립트에 적합.
+
+**케이스 2 — 폰트 로딩으로 텍스트가 안 보임 (FOIT)**
+
+페이지 진입 시 텍스트가 한동안 안 보이다가 갑자기 나타난다. 외부 CSS가 `@font-face`로 폰트를 받는 동안 렌더링이 차단되기 때문.
+
+해결: `<link rel="preload" href="/font.woff2" as="font" crossorigin>` 으로 폰트를 우선 다운로드 시작, `font-display: swap`으로 폴백 폰트 먼저 표시.
+
+## 분야 간 연결
+
+- **frontend (렌더링 파이프라인)**: DOM 구성 후 CSSOM과 결합되어 Render Tree → Layout → Paint으로 이어짐. CRP(Critical Rendering Path)의 첫 단계
+- **cs (자료구조)**: DOM은 트리 구조. 깊이 우선 탐색(DFS)으로 순회되는 일반적 트리 알고리즘과 동일
+
+## 자가 점검
+
+### 개념 체크
+
+- [ ] DOM 트리가 만들어지는 4단계(바이트 → 문자 → 토큰 → 노드 → 트리)를 설명할 수 있는가?
+- [ ] 파서 차단 / 렌더링 차단 / 비차단의 차이를 구분할 수 있는가?
+- [ ] `async`와 `defer`의 차이를 실행 시점·순서 보존 관점에서 설명할 수 있는가?
+
+### 시나리오
+
+**Q1.** 다음 HTML에서 `<h1>` 태그가 화면에 처음 보이는 시점은 언제인가?
+
+```html
+<head>
+  <link rel="stylesheet" href="/main.css" />
+  <script src="/app.js"></script>
+</head>
+<body>
+  <h1>Hello</h1>
+</body>
+```
+
+<details>
+<summary>답 보기</summary>
+
+`/app.js` 다운로드·실행이 끝나야 `<h1>` 토큰이 DOM에 들어간다(파서 차단). 그 후에도 `/main.css`가 받아져야 CSSOM이 완성되고 렌더링이 시작된다. 즉, **두 리소스 중 늦게 끝나는 쪽** 직후에 `<h1>`이 화면에 나타난다.
+
+</details>
+
+**Q2.** 분석 스크립트를 `<body>` 끝에 두는 것과 `<head>`에 `defer`로 두는 것 중 어느 쪽이 더 빠른가?
+
+<details>
+<summary>답 보기</summary>
+
+대부분의 경우 **`<head> + defer`가 더 빠르다**. 브라우저는 HTML 파싱 시작 시점에 `<head>` 안의 리소스를 발견하고 다운로드를 _백그라운드에서_ 시작하기 때문. `<body>` 끝에 두면 파서가 거기까지 도달해야 다운로드가 시작된다(=네트워크 idle 시간 발생).
+
+단, defer는 DOMContentLoaded 직전에 실행되므로 *실행 시점*은 비슷하지만, *다운로드 완료 시점*이 빨라 전체 효과가 좋다.
+
+</details>
+
+## 자주 하는 오해
+
+- ❌ "DOM과 HTML은 같다"
+- ✅ HTML은 텍스트, DOM은 메모리 안의 트리 객체. JS로 `document.querySelector('h1')`처럼 접근 가능한 것은 DOM
+- ❌ "`async`는 항상 `defer`보다 빠르다"
+- ✅ async는 다운로드 끝나자마자 _파싱을 멈추고_ 실행. 여러 스크립트 간 순서가 중요하면 defer가 안전
+
+## 참고 자료
+
+- [Populating the page: how browsers work — MDN](https://developer.mozilla.org/en-US/docs/Web/Performance/How_browsers_work)
+- [Constructing the Object Model — web.dev](https://web.dev/articles/critical-rendering-path-constructing-the-object-model)
+- [Render-blocking Resources — web.dev](https://web.dev/articles/render-blocking-resources)
+- [`<script>` async vs defer — HTML Living Standard](https://html.spec.whatwg.org/multipage/scripting.html#attr-script-async)
