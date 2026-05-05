@@ -3,9 +3,12 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 
+import { MarkCompleted } from '@/components/learn/mark-completed';
+import { MarkReading } from '@/components/learn/mark-reading';
 import { getAdjacentNodes, listPublishedNodes, loadNode } from '@/lib/content/loader';
 import { mdxOptions } from '@/lib/content/mdx';
 import { DOMAIN_META, DOMAINS, type Domain } from '@/lib/content/schema';
+import { createClient } from '@/lib/supabase/server';
 
 type Params = { domain: string; slug: string };
 
@@ -13,8 +16,6 @@ export async function generateStaticParams(): Promise<Params[]> {
   const nodes = await listPublishedNodes();
   return nodes.map((n) => ({ domain: n.domain, slug: n.slug }));
 }
-
-export const dynamic = 'force-static';
 
 function isDomain(value: string): value is Domain {
   return (DOMAINS as readonly string[]).includes(value);
@@ -48,6 +49,10 @@ export default async function NodePage({
   const node = await loadNode(domain, slug);
   if (!node) notFound();
 
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+  const userId = userData.user?.id ?? null;
+
   const { prev, next } = await getAdjacentNodes(node.domain, node.frontmatter.order);
   const allNodes = await listPublishedNodes();
   const prereqs = node.frontmatter.prerequisites
@@ -58,6 +63,8 @@ export default async function NodePage({
 
   return (
     <article>
+      <MarkReading nodeSlug={node.frontmatter.id} enabled={Boolean(userId)} />
+
       <div className="text-muted-foreground mb-6 text-sm">
         <Link href={`/learn/${node.domain}`} className="hover:underline">
           ← {domainMeta.label}
@@ -97,6 +104,8 @@ export default async function NodePage({
       <div className="mdx-body space-y-4 leading-7">
         <MDXRemote source={node.body} options={{ mdxOptions }} />
       </div>
+
+      {userId && <MarkCompleted nodeSlug={node.frontmatter.id} userId={userId} />}
 
       <p className="text-muted-foreground border-border mt-8 border-t pt-4 text-xs">
         이 노드는 외부 자료(MDN·web.dev·공식 문서)와 LLM 보조로 정리한 학습 노트이다.
